@@ -16,7 +16,7 @@ public class MetroSystem {
 
     public void invoke(Command command) {
         switch (command.type) {
-            case ADD -> {
+            case APPEND -> {
                 MetroLine line = lines.get(command.lineName);
                 line.addLast(command.stationName);
             }

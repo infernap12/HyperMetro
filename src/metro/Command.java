@@ -13,7 +13,7 @@ public class Command {
         switch (type) {
             case EXIT:
                 break;
-            case ADD:
+            case APPEND:
             case ADD_HEAD:
                 this.stationName = tokens.get(2);
             case OUTPUT:
@@ -22,7 +22,7 @@ public class Command {
     }
 
     enum CommandType {
-        ADD,
+        APPEND,
         ADD_HEAD,
         EXIT,
         OUTPUT,
