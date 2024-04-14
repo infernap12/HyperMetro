@@ -17,13 +17,20 @@ public class MetroSystem {
     public void invoke(Command command) {
         switch (command.type) {
             case ADD -> {
+                MetroLine line = lines.get(command.lineName);
+                line.addLast(command.stationName);
+            }
+            case EXIT -> {
             }
             case OUTPUT -> {
                 lines.get(command.lineName).output();
             }
-            case EXIT -> {
-            }
             case ADD_HEAD -> {
+                lines.get(command.lineName).addHead(command.stationName);
+            }
+            case REMOVE -> {
+                MetroLine line = lines.get(command.lineName);
+                line.remove(command.stationName);
             }
         }
     }

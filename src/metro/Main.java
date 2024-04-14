@@ -28,7 +28,19 @@ public class Main {
         }
 
         while (true) {
-            Command command = new Command(ArgumentTokenizer.tokenize(SCANNER.nextLine()));
+            Command command;
+            try {
+                command = new Command(ArgumentTokenizer.tokenize(SCANNER.nextLine()));
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid command");
+                continue;
+            }
+            if (command.type == Command.CommandType.EXIT) {
+                System.out.println("Bye!");
+                System.exit(0);
+            } else {
+                metroSystem.invoke(command);
+            }
         }
 
     }

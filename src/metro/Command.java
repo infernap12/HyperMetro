@@ -25,7 +25,8 @@ public class Command {
         ADD,
         ADD_HEAD,
         EXIT,
-        OUTPUT;
+        OUTPUT,
+        REMOVE;
 
         public static CommandType get(String group) {
             return CommandType.valueOf(group.toUpperCase().replaceAll(" |-", "_").replaceAll("/", ""));

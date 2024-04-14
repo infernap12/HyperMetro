@@ -1,5 +1,6 @@
 package metro;
 
+import javax.naming.Name;
 import java.util.*;
 
 public class MetroLine {
@@ -38,15 +39,27 @@ public class MetroLine {
     }
 
     public Station getByName(String stationName) {
+        Station station = null;
         for (Station next : stations) {
             if (next.name.equals(stationName)) {
-                return next;
+                station = next;
+                break;
             }
         }
-        return null;
+        if (station == null) {
+            throw new IllegalArgumentException("Station does not exist");
+        } else {
+            return station;
+        }
     }
 
-    private void remove(Station station) {
+    public void remove(String stationName) throws IllegalArgumentException {
+        Station station;
+        station = getByName(stationName);
+        remove(station);
+    }
+
+    public void remove(Station station) {
         Station previous = station.prev;
         Station next = station.next;
         previous.next = next;
