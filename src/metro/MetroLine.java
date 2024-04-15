@@ -72,13 +72,16 @@ public class MetroLine {
     }
 
     public void output() {
+        System.out.println("depot");
         for (Station next : this.stations) {
-            String previousName = next.prev == null ? "depot" : next.prev.name;
-            String currentName = next.name;
-            String nextName = next.next == null ? "depot" : next.next.name;
-            System.out.printf("%s - %s - %s%n", previousName, currentName, nextName);
+//            String previousName = next.prev == null ? "depot" : next.prev.name;
+//            String currentName = next.name;
+//            String nextName = next.next == null ? "depot" : next.next.name;
+//            System.out.printf("%s - %s - %s%n", previousName, currentName, nextName);
+            System.out.println(next.outputString());
 
         }
+        System.out.println("depot");
     }
 
 }

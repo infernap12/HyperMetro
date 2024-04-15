@@ -32,6 +32,14 @@ public class MetroSystem {
                 MetroLine line = lines.get(command.lineName);
                 line.remove(command.stationName);
             }
+            case CONNECT -> {
+                MetroLine line = lines.get(command.lineName);
+                Station byName = line.getByName(command.stationName);
+                MetroLine transferLine = lines.get(command.transferLine);
+                Station transferStation = transferLine.getByName(command.transferStation);
+                byName.connect(transferLine, transferStation);
+                transferStation.connect(line, byName);
+            }
         }
     }
 }
