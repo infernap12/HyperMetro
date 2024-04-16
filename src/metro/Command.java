@@ -62,6 +62,7 @@ public class Command {
             case EXIT, REMOVE:
                 break;
             case CONNECT:
+            case ROUTE:
                 transferLine = tokens.get(3);
                 transferStation = tokens.get(4);
             case APPEND:
@@ -73,12 +74,13 @@ public class Command {
     }
 
     enum CommandType {
-        APPEND,
         ADD_HEAD,
+        APPEND,
+        CONNECT,
         EXIT,
         OUTPUT,
         REMOVE,
-        CONNECT;
+        ROUTE;
 
         public static CommandType get(String group) {
             return CommandType.valueOf(group.toUpperCase().replaceAll(" |-", "_").replaceAll("/", ""));

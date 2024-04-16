@@ -15,6 +15,10 @@ public class Station {
         this.prev = prev;
     }
 
+    public Set<Transfer> getTransfers() {
+        return transfers;
+    }
+
     public void connect(MetroLine line, Station station) {
         transfers.add(new Transfer(line, station));
     }
