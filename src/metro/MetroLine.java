@@ -19,9 +19,9 @@ public class MetroLine {
         stations = new LinkedList<>();
     }
 
-    public void addLast(String stationName) {
+    public void addLast(String stationName, int time) {
         Station previous = stations.peekLast();
-        Station newStation = new Station(previous, stationName, null);
+        Station newStation = new Station(time, previous, stationName, null);
         if (previous != null) {
             previous.next = newStation;
         }
@@ -29,9 +29,9 @@ public class MetroLine {
     }
 
 
-    public void addHead(String stationName) {
+    public void addHead(String stationName, int time) {
         Station next = stations.peekFirst();
-        Station newStation = new Station(null, stationName, stations.peekFirst());
+        Station newStation = new Station(time, null, stationName, stations.peekFirst());
         if (next != null) {
             next.prev = newStation;
         }

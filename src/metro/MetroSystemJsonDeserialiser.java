@@ -21,12 +21,19 @@ public class MetroSystemJsonDeserialiser implements JsonDeserializer<MetroSystem
             String lineName = metroEntry.getKey();
             MetroLine metroLine = new MetroLine(lineName);
 
-            TreeMap<Integer, String> map = new TreeMap<>();
+            TreeMap<Integer, String> nameMap = new TreeMap<>();
+            Map<Integer, Integer> timeMap = new HashMap<>();
             //let's iterate the stations, shall we?
             for (Map.Entry<String, JsonElement> e : metroEntry.getValue().getAsJsonObject().entrySet()) {
                 int order = Integer.parseInt(e.getKey());
                 JsonObject station = e.getValue().getAsJsonObject();
                 String stationName = station.getAsJsonPrimitive("name").getAsString();
+                int time;
+                if (station.has("time") && !station.get("time").isJsonNull()) {
+                    time = station.getAsJsonPrimitive("time").getAsInt();
+                } else {
+                    time = 0;
+                }
                 JsonArray transfers = station.getAsJsonArray("transfer");
                 if (!transfers.isEmpty()) {
                     for (JsonElement jsonElement : transfers) {
@@ -37,10 +44,11 @@ public class MetroSystemJsonDeserialiser implements JsonDeserializer<MetroSystem
                     }
                 }
 
-                map.put(order, stationName);
+                nameMap.put(order, stationName);
+                timeMap.put(order, time);
             }
 
-            map.forEach((key, value) -> metroLine.addLast(value));
+            nameMap.forEach((key, value) -> metroLine.addLast(value, timeMap.get(key)));
             metroMap.put(metroLine.getName(), metroLine);
         }
         MetroSystem metroSystem = new MetroSystem(metroMap);

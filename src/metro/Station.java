@@ -4,33 +4,36 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Station {
+    public static final int TRANSFER_TIME = 5;
     String name;
+    int time;
     Station prev;
     Station next;
-    private final Set<Transfer> transfers = new HashSet<>();
+    private final Set<EdgeTransfer> edgeTransfers = new HashSet<>();
 
-    Station(Station prev, String name, Station next) {
+    Station(int time, Station prev, String name, Station next) {
         this.name = name;
+        this.time = time;
         this.next = next;
         this.prev = prev;
     }
 
-    public Set<Transfer> getTransfers() {
-        return transfers;
+    public Set<EdgeTransfer> getTransfers() {
+        return edgeTransfers;
     }
 
     public void connect(MetroLine line, Station station) {
-        transfers.add(new Transfer(line, station));
+        edgeTransfers.add(new EdgeTransfer(line, station));
     }
 
-    public record Transfer(MetroLine metroLine, Station station) {
+    public record EdgeTransfer(MetroLine metroLine, Station station) {
     }
 
     public String outputString() {
         StringBuilder sb = new StringBuilder(name);
-        if (!transfers.isEmpty()) {
-            for (Transfer transfer : transfers) {
-                sb.append(" - %s (%s)".formatted(transfer.station.name, transfer.metroLine.getName()));
+        if (!edgeTransfers.isEmpty()) {
+            for (EdgeTransfer edgeTransfer : edgeTransfers) {
+                sb.append(" - %s (%s)".formatted(edgeTransfer.station.name, edgeTransfer.metroLine.getName()));
             }
         }
         return sb.toString();

@@ -9,6 +9,7 @@ public class Command {
     String stationName;
     String transferLine;
     String transferStation;
+    int time;
 
     @Override
     public boolean equals(Object obj) {
@@ -59,28 +60,39 @@ public class Command {
         CommandType type = CommandType.get(tokens.get(0));
         this.type = type;
         switch (type) {
-            case EXIT, REMOVE:
-                break;
-            case CONNECT:
-            case ROUTE:
+            case CONNECT, ROUTE, FASTEST_ROUTE -> {
                 transferLine = tokens.get(3);
                 transferStation = tokens.get(4);
-            case APPEND:
-            case ADD_HEAD:
                 this.stationName = tokens.get(2);
-            case OUTPUT:
                 this.lineName = tokens.get(1);
+            }
+
+            case ADD -> {
+                this.stationName = tokens.get(2);
+                this.lineName = tokens.get(1);
+                this.time = Integer.parseInt(tokens.get(3));
+            }
+
+            case REMOVE, APPEND, ADD_HEAD -> {
+                this.stationName = tokens.get(2);
+                this.lineName = tokens.get(1);
+            }
+
+            case OUTPUT -> this.lineName = tokens.get(1);
+
         }
     }
 
     enum CommandType {
         ADD_HEAD,
+        ADD,
         APPEND,
         CONNECT,
         EXIT,
         OUTPUT,
         REMOVE,
-        ROUTE;
+        ROUTE,
+        FASTEST_ROUTE;
 
         public static CommandType get(String group) {
             return CommandType.valueOf(group.toUpperCase().replaceAll(" |-", "_").replaceAll("/", ""));
