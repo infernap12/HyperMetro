@@ -1,6 +1,7 @@
 package metro;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class MetroSystem {
     private Map<String, MetroLine> lines;
@@ -106,7 +107,7 @@ public class MetroSystem {
                 }
             }
 
-            for (Station adjacentStation : Arrays.asList(currentStation.next, currentStation.prev)) {
+            for (Station adjacentStation : Stream.concat(currentStation.next.stream(), currentStation.prev.stream()).toList()) {
                 if (adjacentStation != null && !visited.contains(adjacentStation)) {
                     visited.add(adjacentStation);
                     que.add(adjacentStation);
@@ -164,22 +165,31 @@ public class MetroSystem {
                     }
                 }
                 // do next/ previous
-                if (currentStation.next != null && !processedStations.contains(currentStation.next)) {
-                    int storedNodeDistance = nodeMap.get(currentStation.next).distance;
-                    int newDistance = currentDistanceFromStart + currentStation.time;
-                    if (newDistance < storedNodeDistance) {
-                        RouteNode node = new RouteNode(currentStation.next, currentStation, currentLine, false, newDistance);
-                        que.add(node);
-                        nodeMap.put(currentStation.next, node);
+                //do null check
+                if (currentStation.next != null) {
+                    for (Station nextStation : currentStation.next) {
+                        if (!processedStations.contains(nextStation)) {
+                            int storedNodeDistance = nodeMap.get(nextStation).distance;
+                            int newDistance = currentDistanceFromStart + currentStation.time;
+                            if (newDistance < storedNodeDistance) {
+                                RouteNode node = new RouteNode(nextStation, currentStation, currentLine, false, newDistance);
+                                que.add(node);
+                                nodeMap.put(nextStation, node);
+                            }
+                        }
                     }
                 }
-                if (currentStation.prev != null && !processedStations.contains(currentStation.prev)) {
-                    int storedNodeDistance = nodeMap.get(currentStation.prev).distance;
-                    int newDistance = currentDistanceFromStart + currentStation.prev.time;
-                    if (newDistance < storedNodeDistance) {
-                        RouteNode node = new RouteNode(currentStation.prev, currentStation, currentLine, false, newDistance);
-                        que.add(node);
-                        nodeMap.put(currentStation.prev, node);
+                if (currentStation.prev != null) {
+                    for (Station prevStation : currentStation.prev) {
+                        if (!processedStations.contains(prevStation)) {
+                            int storedNodeDistance = nodeMap.get(prevStation).distance;
+                            int newDistance = currentDistanceFromStart + prevStation.time;
+                            if (newDistance < storedNodeDistance) {
+                                RouteNode node = new RouteNode(prevStation, currentStation, currentLine, false, newDistance);
+                                que.add(node);
+                                nodeMap.put(prevStation, node);
+                            }
+                        }
                     }
                 }
                 //mark processed

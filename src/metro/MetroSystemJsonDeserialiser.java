@@ -19,14 +19,14 @@ public class MetroSystemJsonDeserialiser implements JsonDeserializer<MetroSystem
         while (iterator.hasNext()) {
             Map.Entry<String, JsonElement> metroEntry = iterator.next();
             String lineName = metroEntry.getKey();
-            MetroLine metroLine = new MetroLine(lineName);
 
-            TreeMap<Integer, String> nameMap = new TreeMap<>();
-            Map<Integer, Integer> timeMap = new HashMap<>();
+            List<String> stationNames = new ArrayList<>();
+            Map<String, Integer> timeMap = new HashMap<>();
+            Map<String, String[]> nextMap = new HashMap<>();
+            Map<String, String[]> prevMap = new HashMap<>();
             //let's iterate the stations, shall we?
-            for (Map.Entry<String, JsonElement> e : metroEntry.getValue().getAsJsonObject().entrySet()) {
-                int order = Integer.parseInt(e.getKey());
-                JsonObject station = e.getValue().getAsJsonObject();
+            for (JsonElement jsonStation : metroEntry.getValue().getAsJsonArray().asList()) {
+                JsonObject station = jsonStation.getAsJsonObject();
                 String stationName = station.getAsJsonPrimitive("name").getAsString();
                 int time;
                 if (station.has("time") && !station.get("time").isJsonNull()) {
@@ -43,12 +43,25 @@ public class MetroSystemJsonDeserialiser implements JsonDeserializer<MetroSystem
                         commandList.add(new Command(List.of("Connect", lineName, stationName, transferLine, transferStation)));
                     }
                 }
+                JsonArray nextElement = station.getAsJsonArray("next");
+                if (!nextElement.isEmpty()) {
+                    nextMap.put(stationName, nextElement.asList().stream().map(JsonElement::getAsString).toArray(String[]::new));
+                }
+                JsonArray prevElement = station.getAsJsonArray("prev");
+                if (!prevElement.isEmpty()) {
+                    prevMap.put(stationName, prevElement.asList().stream().map(JsonElement::getAsString).toArray(String[]::new));
+                }
 
-                nameMap.put(order, stationName);
-                timeMap.put(order, time);
+                stationNames.add(stationName);
+                timeMap.put(stationName, time);
             }
 
-            nameMap.forEach((key, value) -> metroLine.addLast(value, timeMap.get(key)));
+            stationNames.forEach(x -> {
+
+            });
+
+            //stationNames.forEach((name) -> metroLine.addLast(name, timeMap.get(name)));
+            MetroLine metroLine = new MetroLine(lineName, stationNames, timeMap, nextMap, prevMap);
             metroMap.put(metroLine.getName(), metroLine);
         }
         MetroSystem metroSystem = new MetroSystem(metroMap);

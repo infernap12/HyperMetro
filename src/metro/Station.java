@@ -1,21 +1,36 @@
 package metro;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Station {
     public static final int TRANSFER_TIME = 5;
     String name;
+    MetroLine line;
     int time;
-    Station prev;
-    Station next;
+    Set<Station> prev = new HashSet<>();
+    Set<Station> next = new HashSet<>();
     private final Set<EdgeTransfer> edgeTransfers = new HashSet<>();
+
+    Station(int time, Station[] prev, String name, Station[] next) {
+        this.name = name;
+        this.time = time;
+        this.next.addAll(Arrays.asList(next));
+        this.prev.addAll(Arrays.asList(prev));
+    }
+
+    Station(int time, String name) {
+        this.name = name;
+        this.time = time;
+    }
 
     Station(int time, Station prev, String name, Station next) {
         this.name = name;
         this.time = time;
-        this.next = next;
-        this.prev = prev;
+        this.next.add(next);
+        this.prev.add(prev);
+
     }
 
     public Set<EdgeTransfer> getTransfers() {

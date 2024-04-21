@@ -4,12 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.*;
-import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class Main {
     static final Scanner SCANNER = new Scanner(System.in);

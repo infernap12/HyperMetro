@@ -8,7 +8,22 @@ public class MetroLine {
 //    private Station head = null; // just peak the head and tail
 //    private Station tail = null;
     private final String name;
-    private final LinkedList<Station> stations;
+    private final LinkedList<Station> stations = new LinkedList<>();
+
+    public MetroLine(String lineName, List<String> stationNames, Map<String, Integer> timeMap, Map<String, String[]> nextMap, Map<String, String[]> prevMap) {
+        this.name = lineName;
+        stationNames.forEach(x -> stations.add(new Station(timeMap.get(x), x)));
+        Iterator<Station> stationIterator = stations.iterator();
+        while (stationIterator.hasNext()) {
+            Station station = stationIterator.next();
+            if (nextMap.get(station.name) != null) {
+                Arrays.stream(nextMap.get(station.name)).map(this::getByName).forEach(station.next::add);
+            }
+            if (prevMap.get(station.name) != null) {
+                Arrays.stream(prevMap.get(station.name)).map(this::getByName).forEach(station.prev::add);
+            }
+        }
+    }
 
     public LinkedList<Station> getStations() {
         return stations;
@@ -16,14 +31,13 @@ public class MetroLine {
 
     public MetroLine(String lineName) {
         this.name = lineName;
-        stations = new LinkedList<>();
     }
 
     public void addLast(String stationName, int time) {
         Station previous = stations.peekLast();
         Station newStation = new Station(time, previous, stationName, null);
         if (previous != null) {
-            previous.next = newStation;
+            previous.next.add(newStation);
         }
         stations.addLast(newStation);
     }
@@ -33,7 +47,7 @@ public class MetroLine {
         Station next = stations.peekFirst();
         Station newStation = new Station(time, null, stationName, stations.peekFirst());
         if (next != null) {
-            next.prev = newStation;
+            next.prev.add(newStation);
         }
         stations.addFirst(newStation);
     }
@@ -59,12 +73,15 @@ public class MetroLine {
         remove(station);
     }
 
-    public void remove(Station station) {
-        Station previous = station.prev;
-        Station next = station.next;
-        previous.next = next;
-        next.prev = previous;
-        stations.remove(station);
+    public void remove(Station thisStation) {
+        for (Station previousStation : thisStation.prev) {
+            previousStation.next.remove(thisStation);
+            previousStation.next.addAll(thisStation.next);
+        }
+        for (Station nextStation : thisStation.next) {
+            nextStation.prev.remove(thisStation);
+            nextStation.prev.addAll(thisStation.prev);
+        }
     }
 
     public String getName() {
