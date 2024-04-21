@@ -95,7 +95,7 @@ public class Command {
         FASTEST_ROUTE;
 
         public static CommandType get(String group) {
-            return CommandType.valueOf(group.toUpperCase().replaceAll(" |-", "_").replaceAll("/", ""));
+            return CommandType.valueOf(group.toUpperCase().replaceAll("[ \\-]", "_").replaceAll("/", ""));
         }
     }
 }

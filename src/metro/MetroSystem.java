@@ -4,12 +4,13 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class MetroSystem {
-    private Map<String, MetroLine> lines;
+    private final Map<String, MetroLine> lines;
 
     public MetroSystem(Map<String, MetroLine> lines) {
         this.lines = lines;
     }
 
+    @SuppressWarnings("unused")
     public Map<String, MetroLine> getLines() {
         return lines;
     }
@@ -23,12 +24,8 @@ public class MetroSystem {
             }
             case EXIT -> {
             }
-            case OUTPUT -> {
-                lines.get(command.lineName).output();
-            }
-            case ADD_HEAD -> {
-                lines.get(command.lineName).addHead(command.stationName, 0);
-            }
+            case OUTPUT -> lines.get(command.lineName).output();
+            case ADD_HEAD -> lines.get(command.lineName).addHead(command.stationName, 0);
             case REMOVE -> {
                 MetroLine line = lines.get(command.lineName);
                 line.remove(command.stationName);
@@ -46,7 +43,7 @@ public class MetroSystem {
                 Station rootStation = rootLine.getByName(command.stationName);
                 MetroLine destinationLine = lines.get(command.transferLine);
                 Station destinationStation = destinationLine.getByName(command.transferStation);
-                List<RouteNode> nodeList = command.type == Command.CommandType.ROUTE ? bfs(rootLine, rootStation, destinationLine, destinationStation) : dijkstra(rootLine, rootStation, destinationLine, destinationStation);
+                List<RouteNode> nodeList = command.type == Command.CommandType.ROUTE ? bfs(rootLine, rootStation, destinationStation) : dijkstra(rootLine, rootStation, destinationStation);
                 printRoute(nodeList);
                 if (command.type == Command.CommandType.FASTEST_ROUTE) {
                     int routeTime = nodeList.get(nodeList.size() - 1).distance();//get the last nodes distance
@@ -66,7 +63,7 @@ public class MetroSystem {
         }
     }
 
-    private List<RouteNode> bfs(MetroLine rootLine, Station rootStation, MetroLine destinationLine, Station destinationStation) {
+    private List<RouteNode> bfs(MetroLine rootLine, Station rootStation, Station destinationStation) {
         Deque<Station> que = new ArrayDeque<>();
         HashSet<Station> visited = new HashSet<>();
         HashMap<Station, RouteNode> nodeMap = new HashMap<>();
@@ -82,14 +79,7 @@ public class MetroSystem {
 
             //if we hit destination, build the path
             if (currentStation.equals(destinationStation)) {
-                RouteNode node = currentNode;
-                List<RouteNode> list = new ArrayList<>();
-                while (node != null) {
-                    list.add(node);
-                    node = nodeMap.get(node.parent);
-                }
-                Collections.reverse(list);
-                return list;
+                return reconstructPath(nodeMap, currentNode);
             }
 
             for (Station.EdgeTransfer edgeTransfer : currentStation.getTransfers()) {
@@ -124,7 +114,7 @@ public class MetroSystem {
         throw new RuntimeException("No path found.");
     }
 
-    private List<RouteNode> dijkstra(MetroLine rootLine, Station rootStation, MetroLine destinationLine, Station destinationStation) {
+    private List<RouteNode> dijkstra(MetroLine rootLine, Station rootStation, Station destinationStation) {
         PriorityQueue<RouteNode> que = new PriorityQueue<>();
         que.add(new RouteNode(rootStation, null, rootLine, false, 0));
         HashSet<Station> processedStations = new HashSet<>();
@@ -139,14 +129,7 @@ public class MetroSystem {
 
             //if we hit destination, build the path
             if (currentStation.equals(destinationStation)) {
-                RouteNode node = currentNode;
-                List<RouteNode> list = new ArrayList<>();
-                while (node != null) {
-                    list.add(node);
-                    node = nodeMap.get(node.parent);
-                }
-                Collections.reverse(list);
-                return list;
+                return reconstructPath(nodeMap, currentNode);
             }
 
             if (!processedStations.contains(currentStation)) {
@@ -164,8 +147,6 @@ public class MetroSystem {
                         }
                     }
                 }
-                // do next/ previous
-                //do null check
                 if (currentStation.next != null) {
                     for (Station nextStation : currentStation.next) {
                         if (!processedStations.contains(nextStation)) {
@@ -194,14 +175,24 @@ public class MetroSystem {
                 }
                 //mark processed
                 processedStations.add(currentStation);
-            } else {
-                continue;
             }
         }
         throw new RuntimeException("No path found.");
     }
 
-    public record RouteNode(Station station, Station parent, MetroLine line, boolean isTransfer, int distance) implements Comparable<RouteNode>{
+    private List<MetroSystem.RouteNode> reconstructPath(HashMap<Station, MetroSystem.RouteNode> nodeMap, MetroSystem.RouteNode destinationNode) {
+        MetroSystem.RouteNode node = destinationNode;
+        List<MetroSystem.RouteNode> list = new ArrayList<>();
+        while (node != null) {
+            list.add(node);
+            node = nodeMap.get(node.parent);
+        }
+        Collections.reverse(list);
+        return list;
+    }
+
+    public record RouteNode(Station station, Station parent, MetroLine line, boolean isTransfer,
+                            int distance) implements Comparable<RouteNode> {
         public RouteNode(Station station, Station parent, MetroLine line, boolean isTransfer) {
             this(station, parent, line, isTransfer, 0);
         }

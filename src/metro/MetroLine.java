@@ -1,21 +1,15 @@
 package metro;
 
-import javax.naming.Name;
 import java.util.*;
 
 public class MetroLine {
-    //    private static final Station depot = new Station(null, "Depot", null);
-//    private Station head = null; // just peak the head and tail
-//    private Station tail = null;
     private final String name;
     private final LinkedList<Station> stations = new LinkedList<>();
 
     public MetroLine(String lineName, List<String> stationNames, Map<String, Integer> timeMap, Map<String, String[]> nextMap, Map<String, String[]> prevMap) {
         this.name = lineName;
         stationNames.forEach(x -> stations.add(new Station(timeMap.get(x), x)));
-        Iterator<Station> stationIterator = stations.iterator();
-        while (stationIterator.hasNext()) {
-            Station station = stationIterator.next();
+        for (Station station : stations) {
             if (nextMap.get(station.name) != null) {
                 Arrays.stream(nextMap.get(station.name)).map(this::getByName).forEach(station.next::add);
             }
@@ -27,10 +21,6 @@ public class MetroLine {
 
     public LinkedList<Station> getStations() {
         return stations;
-    }
-
-    public MetroLine(String lineName) {
-        this.name = lineName;
     }
 
     public void addLast(String stationName, int time) {
@@ -91,10 +81,6 @@ public class MetroLine {
     public void output() {
         System.out.println("depot");
         for (Station next : this.stations) {
-//            String previousName = next.prev == null ? "depot" : next.prev.name;
-//            String currentName = next.name;
-//            String nextName = next.next == null ? "depot" : next.next.name;
-//            System.out.printf("%s - %s - %s%n", previousName, currentName, nextName);
             System.out.println(next.outputString());
 
         }
